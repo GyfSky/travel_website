@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>选择路线</title>
+  <style type="text/css">
+    #panel {
+        position: fixed;
+        background-color: white;
+        max-height: 90%;
+        overflow-y: auto;
+        top: 10px;
+        right: 10px;
+        width: 280px;
+    }
+    #panel .amap-call {
+        background-color: #009cf9;
+        border-top-left-radius: 4px;
+         border-top-right-radius: 4px;
+    }
+    #panel .amap-lib-driving {
+      border-bottom-left-radius: 4px;
+         border-bottom-right-radius: 4px;
+        overflow: hidden;
+    }
+</style>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.css" />
+  <link rel="stylesheet" href="../static/css/1.css" />
+  <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link rel="stylesheet" href="../static/css/anim-galaxy.css" />
+  
+  <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
+  <script type="text/javascript">
+    window._AMapSecurityConfig = {
+        securityJsCode: "your Amap securityJsCode",
+    }
+  </script>
+      <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=your Amap Key&plugin=AMap.Driving"></script>
+      <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 假设有一个提交按钮
+        document.getElementById('startPlanningButton').addEventListener('click', function(e) {
+            e.preventDefault(); // 阻止默认提交行为
+            
+            // 这里可以添加逻辑来收集表单数据
+            var formData = collectFormData(); // 自定义函数来收集表单项的值
+    
+            // 示例：简单打印出收集到的数据
+            console.log(formData);
+
+            fetch('/routing', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+            // 处理服务器响应
+              console.log(data);
+              if (data[0] === "新用户需要自定义路线") {alert(data[0]);
+                } else if(data[0] === "请选择起点和终点"){
+                     alert(data[0]);
+                }
+              else{
+                  driving.search(data, function(status, result) {
+        // result 即是对应的驾车导航信息，相关数据结构文档请参考  https://lbs.amap.com/api/javascript-api/reference/route-search#m_DrivingResult
+                  if (status === 'complete') {
+                    log.success('路径规划完成')
+                  } else {
+                    log.error('规划路径失败：' + result)
+                  }
+                });
+              }
+        
+            })
+            .catch(error => {
+            // 处理错误
+              console.error('Error:', error);
+            });
+
+        });
+    });
+    
+    // 自定义函数来模拟收集表单数据
+    function collectFormData() {
+        var interests = [];
+        var spots = [];
+        var ratings = document.querySelector('input[name="rating"]:checked');
+        var prices = document.querySelector('input[name="price"]:checked');
+
+        const startPoint = document.getElementById('startPoint').value;
+        const endPoint = document.getElementById('endPoint').value;
+
+        // 收集兴趣类型（复选框）
+        var interestCheckboxes = document.querySelectorAll('.custom1 input[type="checkbox"]');
+        interestCheckboxes.forEach(function(checkbox) {
+            if (checkbox.checked) interests.push(checkbox.id);
+        });
+        
+        var spotsCheckboxes = document.querySelectorAll('.custom5 input[type="checkbox"]');
+        spotsCheckboxes.forEach(function(checkbox) {
+            if (checkbox.checked) spots.push(checkbox.id);
+        });
+
+        return {
+            interests: interests,
+            rating: ratings ? ratings.id : null,
+            price: prices ? prices.id : null,
+            spots: spots,
+            start_end:[startPoint,endPoint]
+
+        };
+    }
+    </script>
+</head>
+<body>
+  <div class="btn">
+    <span class="fas fa-bars"></span>
+  </div>
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <h2>欢迎使用</h2>
+    </div>
+    <ul class="sidebar-links">
+      <h4>
+        <span>推荐路线</span>
+        <div class="menu-separator"></div>
+      </h4>
+      <li>
+        <a href="#" id="least-cost-route">
+          <span class="material-symbols-outlined"> dashboard </span>花费最少</a>
+      </li>
+      <li>
+        <a href="#" id="shortest-route"><span class="material-symbols-outlined"> overview </span>历程最短</a>
+      </li>
+      <li>
+        <a href="#" id="full-tour-route"><span class="material-symbols-outlined"> monitoring </span>评分最高</a>
+      </li>
+      <h4>
+        <span>自定义</span>
+        <div class="menu-separator"></div>
+      </h4>
+      <li>
+        <a href="#" class="custom-btn" data-target=".custom1">兴趣类型
+          <span class="fas fa-caret-down custom1"></span>
+        </a>
+        <form id="filterForm">
+          <ul class="custom-show custom1">
+            <li><input type="checkbox" id="A" /><label for="history">历史文化</label></li>
+            <li><input type="checkbox" id="B" /><label for="religion">宗教文化</label></li>
+            <li><input type="checkbox" id="C" /><label for="plants">植物</label></li>
+            <li><input type="checkbox" id="D" /><label for="mountains">山岭</label></li>
+            <li><input type="checkbox" id="E" /><label for="wild">野趣</label></li>
+            <li><input type="checkbox" id="F" /><label for="literature">文学艺术</label></li>
+            <li><input type="checkbox" id="G" /><label for="lake">湖景</label></li>
+            <li><input type="checkbox" id="H" /><label for="gardens">园林</label></li>
+            <li><input type="checkbox" id="I" /><label for="history_true">正史</label></li>
+            <li><input type="checkbox" id="J" /><label for="family">家庭</label></li>
+            <li><input type="checkbox" id="K" /><label for="architecture">建筑</label></li>
+            <li><input type="checkbox" id="L" /><label for="park">公园</label></li>
+          </ul>
+        </li>
+        <li>
+          <a href="#" class="custom-btn" data-target=".custom2">评分区间
+            <span class="fas fa-caret-down custom2"></span>
+          </a>
+          <ul class="custom-show custom2">
+            <li><input type="radio" name="rating" id="4.5,5.0" /><label for="rating1">4.5分以上</label></li>
+            <li><input type="radio" name="rating" id="3.5,5.0" /><label for="rating2">3.5分以上</label></li>
+            <li><input type="radio" name="rating" id="2.5,5.0" /><label for="rating3">2.5分以上</label></li>
+          </ul>
+        </li>
+        <li>
+          <a href="#" class="custom-btn" data-target=".custom4">花费区间
+            <span class="fas fa-caret-down custom4"></span>
+          </a>
+          <ul class="custom-show custom4">
+            <li><input type="radio" name="price" id="0,200" /><label for="price1">&nbsp;¥200以下</label></li>
+            <li><input type="radio" name="price" id="200,400" /><label for="price2">¥200~400</label></li>
+            <li><input type="radio" name="price" id="600,800" /><label for="price3">¥400~600</label></li>
+            <li><input type="radio" name="price" id="600,800" /><label for="price4">¥600~800</label></li>
+            <li><input type="radio" name="price" id="800,1000" /><label for="price5">¥800~1000</label></li>
+            <li><input type="radio" name="price" id="1000,10000" /><label for="price6">¥1000以上</label></li>
+          </ul>
+        </li>
+        <li>
+          <a href="#" class="custom-btn" data-target=".custom5">手动添加
+            <span class="fas fa-caret-down custom5"></span>
+          </a>
+          <ul class="custom-show custom5">
+            <li><input type="checkbox" id="a1" /><label for="a1">杭州西湖风景名胜区-梅家坞</label></li>
+              <li><input type="checkbox" id="a2" /><label for="a2">真际院</label></li>
+              <li><input type="checkbox" id="a3" /><label for="a3">梅坞春早</label></li>
+              <li><input type="checkbox" id="a4" /><label for="a4">瞭望亭</label></li>
+              <li><input type="checkbox" id="a5" /><label for="a5">九溪十八涧</label></li>
+              <li><input type="checkbox" id="a6" /><label for="a6">理安寺</label></li>
+              <li><input type="checkbox" id="a7" /><label for="a7">梵音亭</label></li>
+              <li><input type="checkbox" id="a8" /><label for="a8">杭州西湖风景名胜区-九曲亭</label></li>
+              <li><input type="checkbox" id="a9" /><label for="a9">杭州西湖风景名胜区-龙井八景</label></li>
+              <li><input type="checkbox" id="a10" /><label for="a10">杭州西湖风景名胜区-杨梅岭</label></li>
+              <li><input type="checkbox" id="a11" /><label for="a11">杭州动物园</label></li>
+              <li><input type="checkbox" id="a12" /><label for="a12">虎跑公园</label></li>
+              <li><input type="checkbox" id="a13" /><label for="a13">六和塔文化公园</label></li>
+              <li><input type="checkbox" id="a14" /><label for="a14">纯阳殿</label></li>
+              <li><input type="checkbox" id="a15" /><label for="a15">古香禅院</label></li>
+              <li><input type="checkbox" id="a16" /><label for="a16">杭州永福寺</label></li>
+              <li><input type="checkbox" id="a17" /><label for="a17">灵隐飞来峰</label></li>
+              <li><input type="checkbox" id="a18" /><label for="a18">济公殿</label></li>
+              <li><input type="checkbox" id="a19" /><label for="a19">史量才墓</label></li>
+              <li><input type="checkbox" id="a20" /><label for="a20">徐锡麟烈士墓</label></li>
+              <li><input type="checkbox" id="a21" /><label for="a21">杭州西湖风景名胜区-秦亭</label></li>
+              <li><input type="checkbox" id="a22" /><label for="a22">美女山</label></li>
+              <li><input type="checkbox" id="a23" /><label for="a23">灵峰探梅</label></li>
+              <li><input type="checkbox" id="a24" /><label for="a24">杭州西湖风景名胜区-状元峰</label></li>
+              <li><input type="checkbox" id="a25" /><label for="a25">漱碧</label></li>
+              <li><input type="checkbox" id="a26" /><label for="a26">杭州植物园</label></li>
+              <li><input type="checkbox" id="a27" /><label for="a27">撷翠亭</label></li>
+              <li><input type="checkbox" id="a28" /><label for="a28">双峰插云</label></li>
+              <li><input type="checkbox" id="a29" /><label for="a29">竹类植物区</label></li>
+              <li><input type="checkbox" id="a30" /><label for="a30">曲院风荷</label></li>
+              <li><input type="checkbox" id="a31" /><label for="a31">郭庄景点</label></li>
+              <li><input type="checkbox" id="a32" /><label for="a32">神舟基地</label></li>
+              <li><input type="checkbox" id="a33" /><label for="a33">美景房车茅家埠营地</label></li>
+              <li><input type="checkbox" id="a34" /><label for="a34">704工程</label></li>
+              <li><input type="checkbox" id="a35" /><label for="a35">杭州西湖风景名胜区-于谦墓</label></li>
+              <li><input type="checkbox" id="a36" /><label for="a36">艺人盖叫天墓</label></li>
+              <li><input type="checkbox" id="a37" /><label for="a37">景行古桥</label></li>
+              <li><input type="checkbox" id="a38" /><label for="a38">芍药圃</label></li>
+              <li><input type="checkbox" id="a39" /><label for="a39">东坡亭</label></li>
+              <li><input type="checkbox" id="a40" /><label for="a40">一炽松树</label></li>
+              <li><input type="checkbox" id="a41" /><label for="a41">九曜阁</label></li>
+              <li><input type="checkbox" id="a42" /><label for="a42">太子湾公园</label></li>
+              <li><input type="checkbox" id="a43" /><label for="a43">大风车</label></li>
+              <li><input type="checkbox" id="a44" /><label for="a44">魏源墓</label></li>
+              <li><input type="checkbox" id="a45" /><label for="a45">挹江亭</label></li>
+              <li><input type="checkbox" id="a46" /><label for="a46">雷峰塔景区</label></li>
+              <li><input type="checkbox" id="a47" /><label for="a47">苏堤</label></li>
+              <li><input type="checkbox" id="a48" /><label for="a48">锁澜桥</label></li>
+              <li><input type="checkbox" id="a49" /><label for="a49">压堤桥</label></li>
+              <li><input type="checkbox" id="a50" /><label for="a50">东浦桥</label></li>
+              <li><input type="checkbox" id="a51" /><label for="a51">钱塘苏小小之墓</label></li>
+              <li><input type="checkbox" id="a52" /><label for="a52">紫云洞</label></li>
+              <li><input type="checkbox" id="a53" /><label for="a53">黄龙吐翠</label></li>
+              <li><input type="checkbox" id="a54" /><label for="a54">宝石山</label></li>
+              <li><input type="checkbox" id="a55" /><label for="a55">北街寻梦</label></li>
+              <li><input type="checkbox" id="a56" /><label for="a56">云水光中</label></li>
+              <li><input type="checkbox" id="a57" /><label for="a57">白堤</label></li>
+              <li><input type="checkbox" id="a58" /><label for="a58">平湖秋月</label></li>
+              <li><input type="checkbox" id="a59" /><label for="a59">海娃塑像</label></li>
+              <li><input type="checkbox" id="a60" /><label for="a60">沙孟海旧居</label></li>
+              <li><input type="checkbox" id="a61" /><label for="a61">音乐喷泉观赏区</label></li>
+              <li><input type="checkbox" id="a62" /><label for="a62">西湖外事游船</label></li>
+              <li><input type="checkbox" id="a63" /><label for="a63">涌金公园</label></li>
+              <li><input type="checkbox" id="a64" /><label for="a64">钱王祠</label></li>
+              <li><input type="checkbox" id="a65" /><label for="a65">柳浪闻莺公园</label></li>
+              <li><input type="checkbox" id="a66" /><label for="a66">学士公园</label></li>
+              <li><input type="checkbox" id="a67" /><label for="a67">华君武</label></li>
+              <li><input type="checkbox" id="a68" /><label for="a68">环翠楼</label></li>
+              <li><input type="checkbox" id="a69" /><label for="a69">紫阳街道游客服务中心</label></li>
+              <li><input type="checkbox" id="a70" /><label for="a70">玄朗洞</label></li>
+              <li><input type="checkbox" id="a71" /><label for="a71">万松书院</label></li>
+              <li><input type="checkbox" id="a72" /><label for="a72">杭州宣和美术馆</label></li>
+              <li><input type="checkbox" id="a73" /><label for="a73">凤凰山上凤凰亭</label></li>
+              <li><input type="checkbox" id="a74" /><label for="a74">圣果寺遗址</label></li>
+              <li><input type="checkbox" id="a75" /><label for="a75">宋韵文化园</label></li>
+              <li><input type="checkbox" id="a76" /><label for="a76">将台山</label></li>
+              <li><input type="checkbox" id="a77" /><label for="a77">玉皇山景区</label></li>
+              <li><input type="checkbox" id="a78" /><label for="a78">石龙洞造像</label></li>
+              <li><input type="checkbox" id="a79" /><label for="a79">西湖风景名胜区-海月亭</label></li>
+              <li><input type="checkbox" id="a80" /><label for="a80">郊坛下和老虎洞窑址</label></li>
+              <li><input type="checkbox" id="a81" /><label for="a81">俶影桥</label></li>
+  
+          </ul>
+        </li>
+        <li>
+          <a href="#" class="custom-btn" data-target=".custom6">起点和终点
+            <span class="fas fa-caret-down custom6"></span>
+          </a>
+          <ul class="custom-show custom6">
+            <li><input type="text" id="startPoint" placeholder="请输入起点" /></li>
+            <li><input type="text" id="endPoint" placeholder="请输入终点" /></li>
+          </ul>
+        </li>
+        <li>
+          <a href="#" id="startPlanningButton"><span class="material-symbols-outlined"> notifications_active </span>开始规划</a>
+        </li>
+        
+        </form>
+       
+    </ul>
+  </nav>
+  <div id="content">
+
+  <div class="canvas-container">
+      <canvas class="canvas-galaxy" id="galaxyCanvas" width="1200px" height="900px"></canvas>
+      <canvas class="canvas-milky-way" id="galaxyMilkyWay" width="1200px" height="900px"></canvas>
+      <div class="canvas-nebula-wrap">
+        <div class="canvas-nebula-img"></div>
+        <canvas class="canvas-nebula" id="nebulaCanvas" width="254" height="254"></canvas>
+      </div>
+      <canvas class="canvas-meteor" id="meteorCanvas"></canvas>
+    </div>
+
+    <div id="map-container"></div>
+    <div id="panel"></div>
+    <section class="game-section">
+      <h2 class="line-title">景点推荐</h2>
+      <div class="owl-carousel custom-carousel owl-theme">
+        {% for spot in spots %}
+        <div class="item" style="background-image: url('../static/img/id_{{ spot[2] }}.jpg');">
+          <div class="item-desc">
+            <h3>{{ spot[0] }}</h3>
+            <p>{{ spot[3] }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- 评分系统开始 -->
+    <section class="rating-section">
+      <h2 class="line-title">路线评分</h2>
+      <div class="container">
+        <div class="post">
+          <div class="text">Thanks for rating us!</div>
+          <div class="edit">EDIT</div>
+        </div>
+        <div class="star-widget">
+          <input type="radio" name="rate" id="rate-5">
+          <label for="rate-5" class="fas fa-star"></label>
+          <input type="radio" name="rate" id="rate-4">
+          <label for="rate-4" class="fas fa-star"></label>
+          <input type="radio" name="rate" id="rate-3">
+          <label for="rate-3" class="fas fa-star"></label>
+          <input type="radio" name="rate" id="rate-2">
+          <label for="rate-2" class="fas fa-star"></label>
+          <input type="radio" name="rate" id="rate-1">
+          <label for="rate-1" class="fas fa-star"></label>
+          <form action="#">
+            <header></header>
+            <div class="textarea">
+              <textarea cols="30" placeholder="Describe your experience.."></textarea>
+            </div>
+            <div class="btnn">
+              <button type="submit">Post</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+    <!-- 评分系统结束 -->
+
+  </div>
+
+  <!-- 手动添加弹窗 -->
+  <div id="manualAddModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>手动添加景点名</h2>
+      <input type="text" id="spotName" placeholder="输入景点名">
+      <button id="addSpot">添加</button>
+    </div>
+  </div>
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js'></script>
+  <script src="../static/js/1.js"></script>
+  <script src="../static/js/anim-galaxy.js"></script>
+  <script>
+  $(document).ready(function () {
+    renderGalaxy(document.getElementById('galaxyCanvas')) // 星空背景
+    renderMilkyWay(document.getElementById('galaxyMilkyWay')) // 星河
+    renderConstellation(document.getElementById('constellationCanvas')) // 星座
+    nebulaAnim(document.getElementById('nebulaCanvas')) // 黑洞
+  });
+</script>
+
+  <script type="text/javascript">
+    var map = new AMap.Map('map-container', {
+      resizeEnable: true,
+      zoom: 13.4,
+      center: [120.118478,30.220671]
+    });
+
+    var driving = new AMap.Driving({
+      map: map,
+
+    });
+
+
+    
+
+    const btn = document.querySelector("button");
+    const post = document.querySelector(".post");
+    const widget = document.querySelector(".star-widget");
+    const editBtn = document.querySelector(".edit");
+    btn.onclick = () => {
+      widget.style.display = "none";
+      post.style.display = "block";
+      editBtn.onclick = () => {
+        widget.style.display = "block";
+        post.style.display = "none";
+      }
+      return false;
+    }
+  </script>
+</body>
+</html>

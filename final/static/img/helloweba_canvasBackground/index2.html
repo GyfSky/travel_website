@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Html5 canvas炫酷背景动画特效</title>
+        <meta name="description" content="Html5 canvas炫酷背景动画特效" />
+        <meta name="keywords" content="canvas, html5" />
+        <link rel="stylesheet" type="text/css" href="css/base.css" />
+        <script>document.documentElement.className="js";var supportsCssVars=function(){var e,t=document.createElement("style");return t.innerHTML="root: { --tmp-var: bold; }",document.head.appendChild(t),e=!!(window.CSS&&window.CSS.supports&&window.CSS.supports("font-weight","var(--tmp-var)")),t.parentNode.removeChild(t),e};supportsCssVars()||alert("Please view this demo in a modern browser that supports CSS Variables.");</script>
+    </head>
+    <body class="demo-2">
+        <main>
+            <div class="frame">
+                <div class="frame__title-wrap">
+                    <h1 class="frame__title"><a href="https://www.helloweba.net/javascript/600.html">Html5 canvas炫酷背景动画特效</a></h1>
+                </div>
+                
+                <div class="frame__demos">
+                    <a href="index.html" class="frame__demo">Demo1</a>
+                    <a href="index2.html" class="frame__demo frame__demo--current">Demo2</a>
+                </div>
+            </div>
+            <div class="content content--canvas">
+                <h2 class="content__title">Demo</h2>
+            </div>
+        </main>
+        <script src="js/noise.min.js"></script>
+        <script src="js/util.js"></script>
+        <script src="js/swirl.js"></script>
+        <script>
+            {setTimeout(() => document.body.classList.add('render'), 60);}
+        </script>
+    </body>
+</html>

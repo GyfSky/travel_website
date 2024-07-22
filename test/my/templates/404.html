@@ -1,0 +1,20 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{{ user}}'s Watchlist</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" type="text/css">
+</head>
+<body>
+    <h2>
+        {{ user}}'s Watchlist
+    </h2>
+    <ul class="movie-list">
+        <li>
+            Page Not Found - 404
+            <span class="float-right">
+                <a href="{{ url_for('index') }}">Go Back</a>
+            </span>
+        </li>
+    </ul>
+</body>
+</html>

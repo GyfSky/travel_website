@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../static/css/bootstrap.css" />
+    <link rel="stylesheet" href="../static/css/daohang.css" />
+    <link rel="stylesheet" href="../static/css/style.css" />
+    <link rel="stylesheet" href="../static/css/footer&cbl.css" />
+    <script type="text/javascript" src="../static/js/jquery-1.11.3.js"></script>
+    <script type="text/javascript" src="../static/js/bootstrap.js"></script>
+    <script type="text/javascript" src="../static/js/index.js"></script>
+    <script type="text/javascript" src="../static/js/templet.js"></script>
+    <script type="text/javascript" src="../static/js/hp.js"></script>
+    <title>旅游景点智能导览平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .Box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 320px;
+            background-color: rgba(0, 0, 0, 0.24);
+            border-radius: 6px;
+            padding: 20px 32px;
+            z-index: 2; /* 确保它在视频上方 */
+        }
+
+        h3 {
+            font-size: 20px;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 500;
+            letter-spacing: 5px;
+        }
+
+        input {
+            width: 100%;
+            height: 35px;
+            border: 1px solid #fff;
+            background-color: transparent;
+            padding-left: 10px;
+            font-size: 12px;
+            color: #fff;
+            margin-bottom: 20px;
+            outline: none;
+            border-radius: 5px;
+        }
+
+        input::placeholder {
+            color: #fff;
+        }
+
+        .btn {
+            width: 150px;
+            height: 50px;
+            line-height: 40px;
+            text-align: center;
+            color: #fff;
+            font-size: 20px;
+            text-transform: uppercase;
+            cursor: pointer;
+            background: linear-gradient(90deg, #03a9f4, #f441a5, #ffeb3b, #03a9f4);
+            background-size: 400%;
+            border-radius: 20px;
+            z-index: 1;
+            display: block;
+            margin: 20px auto;
+        }
+
+
+        .btn:hover {
+            animation: animate 8s linear infinite;
+        }
+
+        @keyframes animate {
+            0% {
+                background-position: 0%;
+            }
+
+            100% {
+                background-position: 400%;
+            }
+        }
+
+        .no {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #ffffff;
+        }
+
+        .video {
+            position: relative;
+            z-index: 1; /* 确保它在表单下方 */
+        }
+        .title {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 48px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #00f, #8a2be2, #32cd32, #00f);
+            background-size: 200%;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-align: center;
+            letter-spacing: 8px;
+            animation: shimmer 5s linear infinite;
+            opacity: 0.3; /* 设置字体透明度 */
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -100%;
+            }
+            100% {
+                background-position: 100%;
+            }
+        }
+
+        .navbar-inverse {
+            background-image: url('static/img/top1.png'); /* 更改为图片的路径 */
+            background-size: cover;
+            background-position: center;
+            border: none;
+        }
+        .alert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            padding: 10px;
+            width: 300px;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ccc;
+            text-align: center;
+            animation: slideIn 1s ease;
+        }
+
+        @keyframes slideIn {
+            from { top: -50px; opacity: 0; }
+            to { top: 20px; opacity: 1; }
+        }
+        .navbar-inverse .navbar-nav > li > a {
+            color: #fff;
+        }
+        /* .alert {
+            position: relative;
+            padding: 7px;
+            margin: 7px 0;
+            border: 1px solid transparent;
+            color: #004085;
+            background-color: #cce5ff;
+            border-color: #b8daff;
+            border-radius: 5px;
+        } */
+        .navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:focus {
+            background-color: rgba(0, 0, 0, 0.5); /* 可选：添加悬停效果 */
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="main">
+        <header id="headers" data-spy="affix" data-offset-top="70">
+            <nav class="navbar-inverse" id="daohang">
+                <div class="daohang">
+                    <div class="collapse navbar-collapse" id="daohangtiao">
+                        <ul class="zcdl nav navbar-nav pull-right">
+                             <li><a href="#" class="btn" id="loginLink">登录</a></li>
+                            <li><a href="#" class="btn" id="registerLink">注册</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+{% for message in get_flashed_messages() %}
+<div class="alert">{{ message }}</div>
+{% endfor %}
+        <div class="c">
+            <div class="video">
+                <video autoplay="autoplay" muted="muted" loop="loop">
+                    <source type="video/webm" src="../static/video/中国.mp4"></source>
+                </video>
+                 <div class="title">旅游景点智能导览平台</div>
+            </div>
+            <div id="loginForm" style="display: none;">
+                <div class="Box">
+                    <h3>旅游景点智能导览平台</h3>
+                    <!-- <form id="loginFormContent">
+                        <input type="text" placeholder="请输入账号" id="username" required>
+                        <input type="password" placeholder="请输入密码" id="password" required>
+                        <button type="button" class="btn" id="loginButton">登录</button>
+                        <p class="no">没有账号？请立即注册</p>
+                    </form> -->
+                    <form method="post" action="http://127.0.0.1:5000/login">
+                        <input type="text" placeholder="请输入账号" id="username" name='username' ><br>  <!-- 文本输入框 -->
+                        <input type="password" placeholder="请输入密码" id="password" name="password" ><br>  <!-- 文本输入框 -->
+                        <input type="submit" name="submit" class="btn" value="登录">  <!-- 提交按钮 -->
+                    </form>
+                </div>
+            </div>
+            <div id="registerForm" style="display: none;">
+                <div class="Box">
+                    <h3>旅游景点智能导览平台</h3>
+                    <!-- <form id="registerFormContent">
+                        <input type="text" placeholder="请输入注册账号" id="registerUsername" required>
+                        <input type="password" placeholder="请输入注册密码" id="registerPassword" required>
+                        <button type="button" class="btn" id="registerButton">注册</button>
+                    </form> -->
+                    <form method="post" action="http://127.0.0.1:5000/register">
+                        <input type="text" placeholder="请输入账号" id="username" name='username' ><br>  <!-- 文本输入框 -->
+                        <input type="password" placeholder="请输入密码" id="password" name="password" ><br>  <!-- 文本输入框 -->
+                        <input type="submit" name="submit" class="btn" value="注册">  <!-- 提交按钮 -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>$(".alert").fadeOut(3000);</script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var loginLink = document.getElementById('loginLink');
+            var registerLink = document.getElementById('registerLink');
+            var loginForm = document.getElementById('loginForm');
+            var registerForm = document.getElementById('registerForm');
+            var loginButton = document.getElementById('loginButton');
+            var registerButton = document.getElementById('registerButton');
+
+            loginLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (loginForm.style.display === 'none' || loginForm.style.display === '') {
+                    loginForm.style.display = 'block';
+                    registerForm.style.display = 'none';
+                } else {
+                    loginForm.style.display = 'none';
+                }
+            });
+
+            registerLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (registerForm.style.display === 'none' || registerForm.style.display === '') {
+                    registerForm.style.display = 'block';
+                    loginForm.style.display = 'none';
+                } else {
+                    registerForm.style.display = 'none';
+                }
+            });
+
+            loginButton.addEventListener('click', function() {
+                var username = document.getElementById('username').value;
+                var password = document.getElementById('password').value;
+
+                fetch('http://localhost:5000/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                })
+                // .then(response => response.text())
+                // .then(data => {
+                //     // if (data === '登录成功') {
+                //     //     alert(data);
+                //     //     window.location.href = "/us";
+                //     // } else {
+                //     //     alert(data);
+                //     // }
+                //     document.open();
+ 
+                //     document.write(data); 
+                //     document.close();
+                // });
+                
+            });
+           
+            registerButton.addEventListener('click', function() {
+                var registerUsername = document.getElementById('registerUsername').value;
+                var registerPassword = document.getElementById('registerPassword').value;
+
+                fetch('http://localhost:5000/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: registerUsername, password: registerPassword })
+                })
+                .then(response => response.text())
+                .then(data => {
+                    alert(data);
+                    if (data === '注册成功') {
+                        registerForm.style.display = 'none';
+                        loginForm.style.display = 'block';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

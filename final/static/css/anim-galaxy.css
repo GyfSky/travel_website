@@ -1,0 +1,214 @@
+
+.canvas-container {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  overflow: hidden;
+  z-index: -1; /* 确保它在其他内容的后面 */
+}
+.canvas-galaxy, .canvas-milky-way, .canvas-meteor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.canvas-galaxy {
+  background: #010117;
+}
+.canvas-constellation-wrap {
+  position: absolute;
+  left: 15px;
+  bottom: 15px;
+}
+.canvas-constellation-wrap canvas {
+  display: block;
+  position: relative;
+  z-index: 3;
+}
+.canvas-constellation-wrap:before {
+  content: ' ';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  z-index: 2;
+  -webkit-transition: opacity 0.3s;-moz-transition: opacity 0.3s;-ms-transition: opacity 0.3s;-o-transition: opacity 0.3s;transition: opacity 0.3s;
+}
+.canvas-constellation-wrap:hover:before {
+  opacity: 1;
+}
+.canvas-nebula-wrap{
+  display: block;
+  position: absolute;
+  top: 50px;
+  right: -50px;
+  width: 254px;
+  height: 254px;
+  opacity: 0.5;
+  transition: all 1s; -moz-transition: all 1s; -ms-transition: all 1s; -o-transition: all 1s; transition: all 1s;
+  overflow: hidden;
+}
+.canvas-nebula-img {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("../nebula.png") no-repeat center/254px auto;
+  -webkit-transform: rotateX(45deg) rotateY(45deg);-moz-transform: rotateX(45deg) rotateY(45deg);-ms-transform: rotateX(45deg) rotateY(45deg);-o-transform: rotateX(45deg) rotateY(45deg);transform: rotateX(45deg) rotateY(45deg);
+  animation: rotate 12s linear infinite;
+}
+@keyframes rotate {
+  0% {
+    transform: rotateX(45deg) rotateY(45deg) rotateZ(0deg);-moz-transform: rotateX(45deg) rotateY(45deg) rotateZ(0deg);-ms-transform: rotateX(45deg) rotateY(45deg) rotateZ(0deg);-o-transform: rotateX(45deg) rotateY(45deg) rotateZ(0deg);transform: rotateX(45deg) rotateY(45deg) rotateZ(0deg);
+  }
+  100% {
+    transform: rotateX(45deg) rotateY(45deg) rotateZ(360deg);-moz-transform: rotateX(45deg) rotateY(45deg) rotateZ(360deg);-ms-transform: rotateX(45deg) rotateY(45deg) rotateZ(360deg);-o-transform: rotateX(45deg) rotateY(45deg) rotateZ(360deg);transform: rotateX(45deg) rotateY(45deg) rotateZ(360deg);
+  }
+}
+.canvas-nebula-wrap:hover{
+  opacity: 0.9;
+}
+.canvas-nebula{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+}.planet-wrap {
+   position: absolute;
+   width: 100%;
+   height: 100%;
+   top: 50px;
+   left: 0
+ }
+.planet-wrap .planet {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  right: 0;
+  top: 0;
+  opacity: .1;
+  border-radius: 50%
+}
+.planet-wrap .planet-1 {
+  width: 474px;
+  height: 474px;
+  right: 100px;
+  top: -395px;
+  background: linear-gradient(90deg,#ff5a25,#ff005a);
+  transition: all 1s linear
+}
+.planet-wrap .planet-2 {
+  width: 70px;
+  height: 70px;
+  left: -50px;
+  top: 220px;
+  opacity: .1;
+  background: linear-gradient(90deg,#ffd000,#f90);
+  transition: all .6s linear
+}
+.planet-wrap .planet-3 {
+  width: 60px;
+  height: 60px;
+  right: 330px;
+  top: 395px;
+  opacity: .07;
+  background: linear-gradient(-90deg,#271e5b,#0d76ef);
+  transition: all .4s linear
+}
+.planet-wrap .planet-8 {
+  width: 25px;
+  height: 25px;
+  right: 445px;
+  top: 136px;
+  opacity: .07;
+  background: linear-gradient(-90deg,#bd4c86,#c864ae);
+  transition: all .5s linear
+}
+.planet-wrap .planet-9 {
+  width: 135px;
+  height: 135px;
+  right: 432px;
+  top: -136px;
+  opacity: .1;
+  background: linear-gradient(0deg,#ff5a25,#ff005a);
+  z-index: 999
+}
+.planet-wrap .planet-10 {
+  width: 25px;
+  height: 25px;
+  right: 278px;
+  top: 41px;
+  opacity: .1;
+  background: linear-gradient(-90deg,#bd4c86,#c864ae)
+}
+.planet-wrap .planet-11 {
+  width: 58px;
+  height: 58px;
+  right: 877px;
+  top: 358px;
+  opacity: .1;
+  background: linear-gradient(-90deg,#271e5b,#0d76ef)
+}
+.planet-wrap .planet-12 {
+  width: 90px;
+  height: 90px;
+  right: -23px;
+  top: 295px;
+  opacity: .1;
+  background: linear-gradient(-90deg,#271e5b,#0d76ef)
+}
+.planet-wrap .planet-13 {
+  width: 25px;
+  height: 25px;
+  right: 523px;
+  top: 495px;
+  opacity: .1;
+  background: linear-gradient(-90deg,#271e5b,#0d76ef)
+}
+.planet-wrap .planet-14 {
+  width: 35px;
+  height: 35px;
+  right: 423px;
+  top: auto;
+  bottom: -15px;
+  opacity: .1;
+  background: linear-gradient(-90deg,#271e5b,#0d76ef)
+}
+.planet-wrap .planet-15 {
+  width: 25px;
+  height: 25px;
+  left: 123px;
+  top: auto;
+  bottom: 125px;
+  opacity: .1;
+  background: linear-gradient(-90deg, #1d1337, #3d5681)
+}
+.planet-wrap .planet-16 {
+  width: 15px;
+  height: 15px;
+  left: 223px;
+  top: auto;
+  bottom: 225px;
+  opacity: .1;
+  background: linear-gradient(-90deg, #270e13, #d60024)
+}
+#content {
+  position: relative;
+  z-index: 1;
+}
+
+#map-container, .game-section, .rating-section {
+  position: relative;
+  z-index: 2;
+}
